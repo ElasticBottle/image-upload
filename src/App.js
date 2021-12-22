@@ -3,6 +3,7 @@ import "./App.css";
 
 function App() {
   const [files, setFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const removeFile = (index) => {
     return () => {
@@ -15,6 +16,19 @@ function App() {
 
   const handleFileChange = (e) => {
     setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
+  };
+
+  const onDropImage = (e) => {
+    handleFileChange({ target: { files: e.dataTransfer.files } });
+    e.preventDefault();
+  };
+  const onDragOverImage = (e) => {
+    setIsDragging(true);
+    e.preventDefault();
+  };
+  const onDragExitImage = (e) => {
+    setIsDragging(false);
+    e.preventDefault();
   };
 
   const handleFileUpload = async () => {
@@ -42,10 +56,16 @@ function App() {
   };
 
   return (
-    <div className="App">
+    // wrapper that should span the whole screen to handle the drag and dropped files
+    <div
+      className="App"
+      onDrop={onDropImage}
+      onDragOver={onDragOverImage}
+      onDragExit={onDragExitImage}
+    >
       <div style={{ marginBottom: "15px" }}>
         <label htmlFor="file-upload" className="custom-file-upload">
-          Upload file
+          {isDragging ? "Drop files to upload!!" : "Upload file"}
         </label>
         <input
           id="file-upload"
@@ -56,6 +76,7 @@ function App() {
           multiple={true}
           onChange={handleFileChange}
         />
+        {/* Displaying the list of uploaded files */}
         {files.map((file, index) => {
           return (
             <React.Fragment key={index}>
